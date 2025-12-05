@@ -1,71 +1,27 @@
 import Character from '../models/Character';
 import sequelize from '../config/database';
+import rickMortyApiClient from '../services/rickMortyApi.client';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const RICK_MORTY_API_URL = process.env.RICK_MORTY_API_URL || 'https://rickandmortyapi.com/graphql';
-
-const query = `
-  query ($page: Int) {
-    characters(page: $page) {
-      info {
-        next
-      }
-      results {
-        id
-        name
-        status
-        species
-        type
-        gender
-        origin {
-          name
-        }
-        image
-      }
-    }
-  }
-`;
-
+/**
+ * Script de Seed
+ * Pobla la base de datos con 15 personajes de la API de Rick & Morty
+ * Usa el cliente de API externa para obtener los datos
+ */
 const seedDatabase = async () => {
   try {
     await sequelize.authenticate();
     console.log('✅ Connected to database.');
 
-    // Sync database (optional, but good to ensure table exists)
-    // await sequelize.sync(); 
-
     console.log('🚀 Starting seed...');
+    console.log('📡 Fetching characters from Rick & Morty API...');
 
-    // Fetch only the first page to get 15 characters
-    const page = 1;
-    console.log(`Fetching characters...`);
-    
-    const response = await fetch(RICK_MORTY_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, variables: { page } }),
-    });
+    // Usar el cliente de API externa para obtener los personajes
+    const characters = await rickMortyApiClient.getCharactersForDb(15);
 
-    const { data } = await response.json() as any;
-    
-    if (!data || !data.characters) {
-      console.error('❌ Error fetching data from API');
-      return;
-    }
-
-    // Take only the first 15 characters
-    const characters = data.characters.results.slice(0, 15).map((char: any) => ({
-      id: Number(char.id),
-      name: char.name,
-      status: char.status,
-      species: char.species,
-      type: char.type || '',
-      gender: char.gender,
-      origin: char.origin.name,
-      image: char.image,
-    }));
+    console.log(`📦 Received ${characters.length} characters.`);
 
     // Bulk create/upsert
     await Character.bulkCreate(characters, {
@@ -73,8 +29,6 @@ const seedDatabase = async () => {
     });
 
     console.log(`✅ Seeded ${characters.length} characters successfully.`);
-
-
     console.log('✨ Seeding completed successfully.');
   } catch (error) {
     console.error('❌ Seeding failed:', error);

@@ -25,8 +25,8 @@
 - [x] 14. Integrar Apollo Server con Express
 
 ## Fase 6: API Externa
-- [ ] 15. Cliente para consumir API de Rick & Morty
-- [ ] 16. Conectar con el seeder para poblar BD
+- [x] 15. Cliente para consumir API de Rick & Morty
+- [x] 16. Conectar con el seeder para poblar BD
 
 ## Fase 7: Redis/Caché
 - [ ] 17. Conexión a Redis (local)

@@ -1,5 +1,6 @@
 import characterService from '../services/character.service';
 import { CharacterFilters } from '../repositories/character.repository';
+import rickMortyApiClient from '../services/rickMortyApi.client';
 
 /**
  * Resolvers de GraphQL
@@ -44,19 +45,30 @@ export const resolvers = {
   Mutation: {
     /**
      * Sincroniza personajes desde la API externa de Rick & Morty
+     * Obtiene los datos de la API y los guarda/actualiza en la BD
      */
     syncCharacters: async () => {
       try {
-        // Esta funcionalidad se conectará con el cliente de la API externa (Fase 6)
+        console.log('📡 Syncing characters from Rick & Morty API...');
+        
+        // Obtener personajes de la API externa
+        const characters = await rickMortyApiClient.getCharactersForDb(15);
+        
+        // Sincronizar con la base de datos
+        await characterService.syncCharacters(characters);
+        
+        console.log(`✅ Synced ${characters.length} characters.`);
+        
         return {
           success: true,
-          message: 'Sync functionality will be implemented with external API client',
-          count: 0,
+          message: `Successfully synced ${characters.length} characters from Rick & Morty API`,
+          count: characters.length,
         };
       } catch (error) {
+        console.error('❌ Sync failed:', error);
         return {
           success: false,
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? error.message : 'Unknown error during sync',
           count: 0,
         };
       }
