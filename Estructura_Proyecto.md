@@ -57,6 +57,8 @@ src/
 
 | Recurso | Ubicación |
 |---------|-----------|
-| PostgreSQL | Supabase (nube) |
+| 
+
+ | Supabase (nube) |
 | Redis | Local |
 | API Rick & Morty | https://rickandmortyapi.com/graphql |
