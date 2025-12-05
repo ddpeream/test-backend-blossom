@@ -20,9 +20,9 @@
 - [x] 11. Service de Characters
 
 ## Fase 5: GraphQL
-- [ ] 12. Schema de GraphQL
-- [ ] 13. Resolvers
-- [ ] 14. Integrar Apollo Server con Express
+- [x] 12. Schema de GraphQL
+- [x] 13. Resolvers
+- [x] 14. Integrar Apollo Server con Express
 
 ## Fase 6: API Externa
 - [ ] 15. Cliente para consumir API de Rick & Morty
