@@ -35,7 +35,7 @@
 ## Fase 8: Opcionales
 - [x] 19. Decorador de tiempo de ejecución
 - [x] 20. Cron job (sincronización cada 12h)
-- [ ] 21. Tests unitarios
+- [x] 21. Tests unitarios
 
 ## Fase 9: Documentación
 - [ ] 22. README con instrucciones
