@@ -33,7 +33,7 @@
 - [x] 18. Integrar caché en las búsquedas
 
 ## Fase 8: Opcionales
-- [ ] 19. Decorador de tiempo de ejecución
+- [x] 19. Decorador de tiempo de ejecución
 - [ ] 20. Cron job (sincronización cada 12h)
 - [ ] 21. Tests unitarios
 

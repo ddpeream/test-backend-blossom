@@ -1,6 +1,7 @@
 import characterRepository, { CharacterFilters } from '../repositories/character.repository';
 import Character from '../models/Character';
 import cacheService from '../cache/cache.service';
+import { ExecutionTime } from '../decorators/executionTime.decorator';
 
 /**
  * Service de Characters
@@ -13,6 +14,7 @@ class CharacterService {
    * Obtiene todos los personajes
    * Primero busca en caché, si no existe, consulta BD y guarda en caché
    */
+  @ExecutionTime('CharacterService.getAllCharacters')
   async getAllCharacters(): Promise<Character[]> {
     // Intentar obtener del caché
     const cached = await cacheService.getCharactersByFilters<Character[]>({});
@@ -34,6 +36,7 @@ class CharacterService {
    * Primero busca en caché, si no existe, consulta BD y guarda en caché
    * @throws Error si el personaje no existe
    */
+  @ExecutionTime('CharacterService.getCharacterById')
   async getCharacterById(id: number): Promise<Character> {
     // Intentar obtener del caché
     const cached = await cacheService.getCharacterById<Character>(id);
@@ -59,6 +62,7 @@ class CharacterService {
    * Filtros disponibles: name, status, species, gender, origin
    * Los resultados se cachean por combinación de filtros
    */
+  @ExecutionTime('CharacterService.searchCharacters')
   async searchCharacters(filters: CharacterFilters): Promise<Character[]> {
     // Si no hay filtros, usar getAllCharacters (que ya tiene caché)
     if (!filters || Object.keys(filters).length === 0) {
