@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { testConnection } from './config/database';
 import { loggingMiddleware } from './middlewares/logging.middleware';
+import { createApolloServer } from './graphql';
 
 dotenv.config();
 
@@ -18,6 +19,10 @@ app.get('/health', (req: Request, res: Response) => {
 
 const startServer = async () => {
   await testConnection();
+  
+  // Inicializar Apollo Server
+  await createApolloServer(app);
+  
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
