@@ -5,11 +5,13 @@ import { testRedisConnection } from './config/redis';
 import { loggingMiddleware } from './middlewares/logging.middleware';
 import { createApolloServer } from './graphql';
 import cacheService from './cache/cache.service';
+import syncCharactersJob from './jobs/syncCharacters.job';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+const ENABLE_CRON = process.env.ENABLE_CRON !== 'false'; // Habilitado por defecto
 
 app.use(express.json());
 app.use(loggingMiddleware);
@@ -17,10 +19,12 @@ app.use(loggingMiddleware);
 // Health Check Endpoint
 app.get('/health', (req: Request, res: Response) => {
   const redisConnected = cacheService.isConnected();
+  const cronRunning = syncCharactersJob.isRunning();
   res.status(200).json({ 
     status: 'OK', 
     message: 'Server is running 🚀',
-    redis: redisConnected ? 'connected' : 'disconnected'
+    redis: redisConnected ? 'connected' : 'disconnected',
+    cron: cronRunning ? 'running' : 'stopped'
   });
 });
 
@@ -33,6 +37,11 @@ const startServer = async () => {
   
   // Inicializar Apollo Server
   await createApolloServer(app);
+
+  // Iniciar cron job de sincronización (cada 12 horas)
+  if (ENABLE_CRON) {
+    syncCharactersJob.start();
+  }
   
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
