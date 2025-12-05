@@ -29,8 +29,8 @@
 - [x] 16. Conectar con el seeder para poblar BD
 
 ## Fase 7: Redis/Caché
-- [ ] 17. Conexión a Redis (local)
-- [ ] 18. Integrar caché en las búsquedas
+- [x] 17. Conexión a Redis (local)
+- [x] 18. Integrar caché en las búsquedas
 
 ## Fase 8: Opcionales
 - [ ] 19. Decorador de tiempo de ejecución

@@ -1,30 +1,55 @@
 import characterRepository, { CharacterFilters } from '../repositories/character.repository';
 import Character from '../models/Character';
+import cacheService from '../cache/cache.service';
 
 /**
  * Service de Characters
  * Capa de lógica de negocio que orquesta las operaciones.
  * Se comunica con el Repository para acceder a los datos.
- * Más adelante integrará el caché con Redis.
+ * Integra caché con Redis para optimizar consultas.
  */
 class CharacterService {
   /**
    * Obtiene todos los personajes
+   * Primero busca en caché, si no existe, consulta BD y guarda en caché
    */
   async getAllCharacters(): Promise<Character[]> {
-    return characterRepository.findAll();
+    // Intentar obtener del caché
+    const cached = await cacheService.getCharactersByFilters<Character[]>({});
+    if (cached) {
+      return cached;
+    }
+
+    // Si no está en caché, consultar BD
+    const characters = await characterRepository.findAll();
+    
+    // Guardar en caché para futuras consultas
+    await cacheService.setCharactersByFilters({}, characters);
+    
+    return characters;
   }
 
   /**
    * Obtiene un personaje por su ID
+   * Primero busca en caché, si no existe, consulta BD y guarda en caché
    * @throws Error si el personaje no existe
    */
   async getCharacterById(id: number): Promise<Character> {
+    // Intentar obtener del caché
+    const cached = await cacheService.getCharacterById<Character>(id);
+    if (cached) {
+      return cached;
+    }
+
+    // Si no está en caché, consultar BD
     const character = await characterRepository.findById(id);
     
     if (!character) {
       throw new Error(`Character with ID ${id} not found`);
     }
+
+    // Guardar en caché para futuras consultas
+    await cacheService.setCharacterById(id, character);
     
     return character;
   }
@@ -32,14 +57,27 @@ class CharacterService {
   /**
    * Busca personajes con filtros opcionales
    * Filtros disponibles: name, status, species, gender, origin
+   * Los resultados se cachean por combinación de filtros
    */
   async searchCharacters(filters: CharacterFilters): Promise<Character[]> {
-    // Si no hay filtros, devolver todos
+    // Si no hay filtros, usar getAllCharacters (que ya tiene caché)
     if (!filters || Object.keys(filters).length === 0) {
-      return characterRepository.findAll();
+      return this.getAllCharacters();
     }
 
-    return characterRepository.findWithFilters(filters);
+    // Intentar obtener del caché
+    const cached = await cacheService.getCharactersByFilters<Character[]>(filters);
+    if (cached) {
+      return cached;
+    }
+
+    // Si no está en caché, consultar BD
+    const characters = await characterRepository.findWithFilters(filters);
+    
+    // Guardar en caché para futuras consultas
+    await cacheService.setCharactersByFilters(filters, characters);
+    
+    return characters;
   }
 
   /**
@@ -81,9 +119,15 @@ class CharacterService {
 
   /**
    * Sincroniza personajes desde la API externa (usado por el seeder/cron)
+   * Invalida todo el caché después de sincronizar
    */
   async syncCharacters(characters: Partial<Character>[]): Promise<Character[]> {
-    return characterRepository.bulkCreateOrUpdate(characters);
+    const result = await characterRepository.bulkCreateOrUpdate(characters);
+    
+    // Invalidar caché después de sincronizar
+    await cacheService.invalidateAll();
+    
+    return result;
   }
 
   /**
