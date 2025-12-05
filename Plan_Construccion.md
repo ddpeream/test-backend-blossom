@@ -38,6 +38,6 @@
 - [x] 21. Tests unitarios
 
 ## Fase 9: Documentación
-- [ ] 22. README con instrucciones
+- [x] 22. README con instrucciones
 - [ ] 23. Diagrama ERD
 - [ ] 24. Swagger (opcional)
