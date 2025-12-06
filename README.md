@@ -131,13 +131,19 @@ El servidor estará disponible en `http://localhost:4000`
 | Endpoint | Descripción |
 |----------|-------------|
 | `GET /health` | Health check del servidor |
+| `GET /api-docs` | Documentación Swagger UI |
 | `POST /graphql` | API GraphQL |
+| `GET /graphql` | Apollo Playground |
 
 ## 📊 API GraphQL
 
 ### Playground
 
 Accede a `http://localhost:4000/graphql` para el playground de Apollo.
+
+### Swagger Documentation
+
+Accede a `http://localhost:4000/api-docs` para ver la documentación Swagger UI.
 
 ### Queries Disponibles
 
@@ -333,7 +339,7 @@ Los métodos del servicio están decorados con `@ExecutionTime`:
 
 ## 👤 Autor
 
-**David Peralta** - [GitHub](https://github.com/ddpeream)
+**Deimar Perea Moreno** - [GitHub](https://github.com/ddpeream)
 
 ## 📄 Licencia
 
